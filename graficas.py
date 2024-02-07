@@ -13,7 +13,7 @@ def bubble_sort(arr):
                 arr[j], arr[j+1] = arr[j+1], arr[j]
 
 # Algoritmo de ordenamiento Insertion Sort
-def insertion_sort(arr):
+def gnome_sort(arr):
     n = len(arr)
     for i in range(1, n):
         key = arr[i]
@@ -55,14 +55,14 @@ def merge_sort(arr):
             k += 1
 
 # Algoritmo de ordenamiento Quick Sort
-def quick_sort(arr):
+def countingSort_sort(arr):
     if len(arr) <= 1:
         return arr
     pivot = arr[len(arr) // 2]
     left = [x for x in arr if x < pivot]
     middle = [x for x in arr if x == pivot]
     right = [x for x in arr if x > pivot]
-    return quick_sort(left) + middle + quick_sort(right)
+    return countingSort_sort(left) + middle + countingSort_sort(right)
 
 # Algoritmo de ordenamiento Selection Sort
 def selection_sort(arr):
@@ -98,9 +98,9 @@ selection_sort_times = []
 for size in data_sizes:
     data = generate_random_data(size)
     bubble_sort_times.append(measure_time(bubble_sort, data.copy()))
-    insertion_sort_times.append(measure_time(insertion_sort, data.copy()))
+    insertion_sort_times.append(measure_time(gnome_sort, data.copy()))
     merge_sort_times.append(measure_time(merge_sort, data.copy()))
-    quick_sort_times.append(measure_time(quick_sort, data.copy()))
+    quick_sort_times.append(measure_time(countingSort_sort, data.copy()))
     selection_sort_times.append(measure_time(selection_sort, data.copy()))
 
 # Graficar los tiempos de ejecución
