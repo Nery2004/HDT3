@@ -1,3 +1,4 @@
+import cProfile
 import random
 import time
 import matplotlib.pyplot as plt
@@ -12,16 +13,18 @@ def bubble_sort(arr):
             if arr[j] > arr[j+1]:
                 arr[j], arr[j+1] = arr[j+1], arr[j]
 
-# Algoritmo de ordenamiento Insertion Sort
+# Algoritmo de ordenamiento Gnome Sort
 def gnome_sort(arr):
     n = len(arr)
-    for i in range(1, n):
-        key = arr[i]
-        j = i-1
-        while j >= 0 and key < arr[j]:
-            arr[j+1] = arr[j]
-            j -= 1
-        arr[j+1] = key
+    i = 0
+    while i < n:
+        if i == 0:
+            i = i + 1
+        if arr[i] >= arr[i-1]:
+            i = i + 1
+        else:
+            arr[i], arr[i-1] = arr[i-1], arr[i]
+            i = i - 1
 
 # Algoritmo de ordenamiento Merge Sort
 def merge_sort(arr):
@@ -55,14 +58,14 @@ def merge_sort(arr):
             k += 1
 
 # Algoritmo de ordenamiento Quick Sort
-def countingSort_sort(arr):
+def quick_sort(arr):
     if len(arr) <= 1:
         return arr
-    pivot = arr[len(arr) // 2]
-    left = [x for x in arr if x < pivot]
-    middle = [x for x in arr if x == pivot]
-    right = [x for x in arr if x > pivot]
-    return countingSort_sort(left) + middle + countingSort_sort(right)
+    else:
+        pivot = arr[0]
+        left = [x for x in arr[1:] if x <= pivot]
+        right = [x for x in arr[1:] if x > pivot]
+        return quick_sort(left) + [pivot] + quick_sort(right)
 
 # Algoritmo de ordenamiento Selection Sort
 def selection_sort(arr):
@@ -74,11 +77,59 @@ def selection_sort(arr):
                 min_idx = j
         arr[i], arr[min_idx] = arr[min_idx], arr[i]
 
-# Función para generar datos de entrada aleatorios
+# Algoritmo de ordenamiento Counting Sort
+def counting_sort(arr):
+    max_val = max(arr)
+    count = [0] * (max_val + 1)
+    sorted_arr = [0] * len(arr)
+
+    for num in arr:
+        count[num] += 1
+
+    for i in range(1, max_val + 1):
+        count[i] += count[i - 1]
+
+    for num in reversed(arr):
+        sorted_arr[count[num] - 1] = num
+        count[num] -= 1
+
+    return sorted_arr
+
+# Algoritmo de ordenamiento Radix Sort
+def counting_sort_radix(arr, exp):
+    n = len(arr)
+    output = [0] * n
+    count = [0] * 10
+
+    for i in range(n):
+        index = arr[i] // exp
+        count[index % 10] += 1
+
+    for i in range(1, 10):
+        count[i] += count[i - 1]
+
+    i = n - 1
+    while i >= 0:
+        index = arr[i] // exp
+        output[count[index % 10] - 1] = arr[i]
+        count[index % 10] -= 1
+        i -= 1
+
+    for i in range(n):
+        arr[i] = output[i]
+
+def radix_sort(arr):
+    max_val = max(arr)
+    exp = 1
+    while max_val // exp > 0:
+        counting_sort_radix(arr, exp)
+        exp *= 10
+
+# Función para generar datos aleatorios
 def generate_random_data(size):
     return [random.randint(0, size) for _ in range(size)]
 
-# Función para medir el tiempo de ejecución de un algoritmo de ordenamiento
+# Función para medir el tiempo de ejecución
 def measure_time(algorithm, data):
     start_time = time.time()
     algorithm(data)
@@ -90,26 +141,33 @@ data_sizes = [100, 200, 300, 400, 500]
 
 # Medir tiempos de ejecución para cada algoritmo
 bubble_sort_times = []
-insertion_sort_times = []
+gnome_sort_times = []
 merge_sort_times = []
 quick_sort_times = []
 selection_sort_times = []
+counting_sort_times = []
+radix_sort_times = []
 
 for size in data_sizes:
     data = generate_random_data(size)
     bubble_sort_times.append(measure_time(bubble_sort, data.copy()))
-    insertion_sort_times.append(measure_time(gnome_sort, data.copy()))
+    gnome_sort_times.append(measure_time(gnome_sort, data.copy()))
     merge_sort_times.append(measure_time(merge_sort, data.copy()))
-    quick_sort_times.append(measure_time(countingSort_sort, data.copy()))
+    quick_sort_times.append(measure_time(quick_sort, data.copy()))
     selection_sort_times.append(measure_time(selection_sort, data.copy()))
+    counting_sort_times.append(measure_time(counting_sort, data.copy()))
+    radix_sort_times.append(measure_time(radix_sort, data.copy()))
 
 # Graficar los tiempos de ejecución
 plt.figure(figsize=(10, 6))
 plt.plot(data_sizes, bubble_sort_times, label='Bubble Sort')
-plt.plot(data_sizes, insertion_sort_times, label='Insertion Sort')
+plt.plot(data_sizes, gnome_sort_times, label='Gnome Sort')
 plt.plot(data_sizes, merge_sort_times, label='Merge Sort')
 plt.plot(data_sizes, quick_sort_times, label='Quick Sort')
 plt.plot(data_sizes, selection_sort_times, label='Selection Sort')
+plt.plot(data_sizes, counting_sort_times, label='Counting Sort')
+plt.plot(data_sizes, radix_sort_times, label='Radix Sort')
+
 plt.xlabel('Tamaño del conjunto de datos')
 plt.ylabel('Tiempo de ejecución (segundos)')
 plt.title('Rendimiento teórico esperado de algoritmos de ordenamiento')
